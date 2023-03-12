@@ -3,13 +3,13 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Crop</title>
+  <title>ImageCrop</title>
   <style>
     .image-container {
       position: relative;
     }
 
-    #image-container img {
+    #image-container img, .cell {
       user-drag: none;
       user-select: none;
       -moz-user-select: none;
@@ -39,7 +39,7 @@
 
     }
 
-    #dropzone {
+    .dropzone {
       width: 30vw;
       height: 10vh;
       border: 2px dashed #aaa;
@@ -49,6 +49,24 @@
       font-size: 20px;
       font-weight: bold;
     }
+
+        #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      z-index: 1;
+    }
+
+    #navbar a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
@@ -56,6 +74,8 @@
 </head>
 
 <body>
+    <nav id="navbar">
+    
   <label for="targetWInput">targetW:</label>
   <input type="number" id="targetWInput" name="targetWInput" min="1" max="5000" value="512">
   <label for="targetHInput">targetH:</label>
@@ -66,17 +86,24 @@
   <label for="paddingHInput">paddingH:</label>
   <input type="number" id="paddingHInput" name="paddingHInput" min="0" max="5000" value="0">
   <br>
-  <button onclick="updateAll()">Apply</button>
-  <br>
-  <input type="file" id="folderInput" webkitdirectory>
-  <h1>O R</h1>
-  <div id="dropzone">Drop image here</div>
+    <button onclick="updateAll()">Apply</button>
+
+    <br>
+    <button onclick="clearAllImages()">Clear All Images</button>
+    <button onclick="cropAllAndDownload()">Crop And Download</button>
+      </nav>
+
+  <div id="main">
+  <input type="file" id="folderInput" style="display: none;" multiple>
+
+  <div class="dropzone" onclick="document.getElementById('folderInput').click();">
+    Drop image here or click to choose
+  </div>
 
   <!-- <button onclick="saveAsJson()">SaveAsJson</button> -->
-  <button onclick="clearAllImages()">Clear All Images</button>
-  <button onclick="cropAllAndDownload()">Crop And Download</button>
-  <div id="imageContainers"></div>
 
+  <div id="imageContainers"></div>
+</div>
   <script>
     var draggingElement = null;
     var boxStartX, boxStartY, mouseStartX, mouseStartY;
@@ -88,10 +115,15 @@
     const targetHInput = document.querySelector('#targetHInput');
     const paddingWInput = document.querySelector('#paddingWInput');
     const paddingHInput = document.querySelector('#paddingHInput');
-    const dropzone = document.querySelector("#dropzone");
+    const dropzone = document.querySelector(".dropzone");
     const folderInput = document.querySelector('#folderInput');
     const imageContainers = document.querySelector('#imageContainers');
 
+        // ----------------------------------------Init---------------------------------------------------------//
+
+    window.onload = () => {
+            document.querySelector('#main').style.paddingTop = document.querySelector('#navbar').offsetHeight + "px";
+    }
     // ----------------------------------------Drop Box---------------------------------------------------------//
     ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
       dropzone.addEventListener(eventName, preventDefaults, false)
@@ -126,6 +158,7 @@
         divWapper.targetBoxHWRatio = targetBoxHWRatio;
         divWapper.imgWPadding = imgWPadding;
         divWapper.imgHPadding = imgHPadding;
+        // divWapper.firstChild.onload();
         renderDivWapper(divWapper);
       }
     }
@@ -198,10 +231,11 @@
 
       divWapper.imgWPadding = parseInt(paddingWInput.value);
       divWapper.imgHPadding = parseInt(paddingHInput.value);
-      divWapper.boxWidth = 50;
+
+      divWapper.boxWidth = Math.min(maxImageW - 2 * divWapper.imgWPadding, maxImageH/targetBoxHWRatio - 2 * divWapper.imgHPadding);
       divWapper.targetBoxHWRatio = targetBoxHWRatio;
-      divWapper.boxLeft = 0;
-      divWapper.boxTop = 0;
+      divWapper.boxLeft = divWapper.imgWPadding;
+      divWapper.boxTop = divWapper.imgHPadding;
       divWapper.discard = false;
       divWapper.targetW = targetW;
 
@@ -220,15 +254,13 @@
       divWapper.fileName = name;
 
       image.onload = () => {
-        var scaleFactor = (maxImageW - 2 * divWapper.imgWPadding) / image.naturalWidth;
-        if (scaleFactor > (maxImageH - 2 * divWapper.imgHPadding) / image.naturalHeight) {
-          scaleFactor = (maxImageH - 2 * divWapper.imgHPadding) / image.naturalHeight;
-        }
+        var scaleFactor = Math.min((maxImageW - 2 * divWapper.imgWPadding) / image.naturalWidth, (maxImageH - 2 * divWapper.imgHPadding) / image.naturalHeight);
+
         image.width = image.naturalWidth * scaleFactor;
         image.height = image.naturalHeight * scaleFactor;
         divWapper.scaleFactor = scaleFactor;
       }
-
+      
       renderDivWapper(divWapper);
       return cell;
     }
@@ -239,8 +271,8 @@
       const imgWPadding = parseInt(paddingWInput.value);
       const imgHPadding = parseInt(paddingHInput.value);
 
-      const maxImageW = document.documentElement.clientWidth / 3;
-      const maxImageH = document.documentElement.clientHeight / 3;
+      const maxImageW = document.documentElement.clientWidth / 4;
+      const maxImageH = document.documentElement.clientHeight / 2;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
