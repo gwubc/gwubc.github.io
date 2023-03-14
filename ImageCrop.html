@@ -9,7 +9,8 @@
       position: relative;
     }
 
-    #image-container img, .cell {
+    #image-container img,
+    .cell {
       user-drag: none;
       user-select: none;
       -moz-user-select: none;
@@ -50,7 +51,7 @@
       font-weight: bold;
     }
 
-        #navbar {
+    #navbar {
       position: fixed;
       top: 0;
       left: 0;
@@ -66,7 +67,6 @@
       text-decoration: none;
       margin: 0 10px;
     }
-
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
@@ -74,40 +74,40 @@
 </head>
 
 <body>
-    <nav id="navbar">
-    
-  <label for="targetWInput">targetW:</label>
-  <input type="number" id="targetWInput" name="targetWInput" min="1" max="5000" value="512">
-  <label for="targetHInput">targetH:</label>
-  <input type="number" id="targetHInput" name="targetHInput" min="1" max="5000" value="512">
-  <br>
-  <label for="paddingWInput">paddingW:</label>
-  <input type="number" id="paddingWInput" name="paddingWInput" min="0" max="5000" value="0">
-  <label for="paddingHInput">paddingH:</label>
-  <input type="number" id="paddingHInput" name="paddingHInput" min="0" max="5000" value="0">
-  <br>
+  <nav id="navbar">
+
+    <label for="targetWInput">targetW:</label>
+    <input type="number" id="targetWInput" name="targetWInput" min="1" max="5000" value="512">
+    <label for="targetHInput">targetH:</label>
+    <input type="number" id="targetHInput" name="targetHInput" min="1" max="5000" value="512">
+    <br>
+    <label for="paddingWInput">paddingW:</label>
+    <input type="number" id="paddingWInput" name="paddingWInput" min="0" max="5000" value="0">
+    <label for="paddingHInput">paddingH:</label>
+    <input type="number" id="paddingHInput" name="paddingHInput" min="0" max="5000" value="0">
+    <br>
     <button onclick="updateAll()">Apply</button>
 
     <br>
     <button onclick="clearAllImages()">Clear All Images</button>
     <button onclick="cropAllAndDownload()">Crop And Download</button>
-      </nav>
+  </nav>
 
   <div id="main">
-  <input type="file" id="folderInput" style="display: none;" multiple>
+    <input type="file" id="folderInput" style="display: none;" multiple>
 
-  <div class="dropzone" onclick="document.getElementById('folderInput').click();">
-    Drop image here or click to choose
+    <div class="dropzone" onclick="document.getElementById('folderInput').click();">
+      Drop image here or click to choose
+    </div>
+
+    <!-- <button onclick="saveAsJson()">SaveAsJson</button> -->
+
+    <div id="imageContainers"></div>
   </div>
-
-  <!-- <button onclick="saveAsJson()">SaveAsJson</button> -->
-
-  <div id="imageContainers"></div>
-</div>
   <script>
     var draggingElement = null;
     var boxStartX, boxStartY, mouseStartX, mouseStartY;
-    var divWapperBase = null;
+    var imageContainerBase = null;
 
     const boxColor = "red";
 
@@ -119,10 +119,10 @@
     const folderInput = document.querySelector('#folderInput');
     const imageContainers = document.querySelector('#imageContainers');
 
-        // ----------------------------------------Init---------------------------------------------------------//
+    // ----------------------------------------Init---------------------------------------------------------//
 
     window.onload = () => {
-            document.querySelector('#main').style.paddingTop = document.querySelector('#navbar').offsetHeight + "px";
+      document.querySelector('#main').style.paddingTop = document.querySelector('#navbar').offsetHeight + "px";
     }
     // ----------------------------------------Drop Box---------------------------------------------------------//
     ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
@@ -144,29 +144,29 @@
       const targetBoxHWRatio = parseInt(targetHInput.value) / targetW;
       const imgWPadding = parseInt(paddingWInput.value);
       const imgHPadding = parseInt(paddingHInput.value);
-      const divWappers = getAlldivWapper();
+      const imageContainers = getAllimageContainer();
 
-      for (var i = 0; i < divWappers.length; i++) {
-        const divWapper = divWappers[i];
-        divWapper.boxLeft += imgWPadding - divWapper.imgWPadding;
-        if (divWapper.boxLeft < 0) divWapper.boxLeft = 0;
-        divWapper.boxTop += imgHPadding - divWapper.imgHPadding;
-        if (divWapper.boxTop < 0) divWapper.boxTop = 0;
+      for (var i = 0; i < imageContainers.length; i++) {
+        const imageContainer = imageContainers[i];
+        imageContainer.boxLeft += imgWPadding - imageContainer.imgWPadding;
+        if (imageContainer.boxLeft < 0) imageContainer.boxLeft = 0;
+        imageContainer.boxTop += imgHPadding - imageContainer.imgHPadding;
+        if (imageContainer.boxTop < 0) imageContainer.boxTop = 0;
 
-        divWapper.targetW = targetW;
-        if (targetBoxHWRatio > divWapper.targetBoxHWRatio) divWapper.boxWidth = divWapper.boxWidth * divWapper.targetBoxHWRatio / targetBoxHWRatio;
-        divWapper.targetBoxHWRatio = targetBoxHWRatio;
-        divWapper.imgWPadding = imgWPadding;
-        divWapper.imgHPadding = imgHPadding;
-        // divWapper.firstChild.onload();
-        renderDivWapper(divWapper);
+        imageContainer.targetW = targetW;
+        if (targetBoxHWRatio > imageContainer.targetBoxHWRatio) imageContainer.boxWidth = imageContainer.boxWidth * imageContainer.targetBoxHWRatio / targetBoxHWRatio;
+        imageContainer.targetBoxHWRatio = targetBoxHWRatio;
+        imageContainer.imgWPadding = imgWPadding;
+        imageContainer.imgHPadding = imgHPadding;
+        // imageContainer.firstChild.onload();
+        renderimageContainer(imageContainer);
       }
     }
 
 
     function saveAsJson() {
-      const divWappers = getAlldivWapper()
-      const boxsJson = divWappers.map(getDimension);
+      const imageContainers = getAllimageContainer()
+      const boxsJson = imageContainers.map(getDimension);
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(boxsJson));
       const dlAnchorElem = document.createElement("a");
       dlAnchorElem.setAttribute("href", dataStr);
@@ -189,79 +189,84 @@
       e.stopPropagation();
     }
 
-    function getAlldivWapper(ignoreDiscard = false) {
+    function getAllimageContainer(ignoreDiscard = false) {
       retVal = [];
       var children = imageContainers.children;
       for (var i = 0; i < children.length; i++) {
-        const divWapper = children[i].firstChild;
-        if ((!ignoreDiscard) || (!divWapper.discard)) retVal.push(divWapper);
+        const imageContainer = children[i].firstChild;
+        if ((!ignoreDiscard) || (!imageContainer.discard)) retVal.push(imageContainer);
       }
       return retVal;
     }
 
-    function getDimension(divWapper) {
+    function getDimension(imageContainer) {
       return {
-        fileName: divWapper.fileName,
-        x: parseInt((parseFloat(divWapper.lastChild.style.left) - divWapper.imgWPadding) / divWapper.scaleFactor), y: parseInt((parseFloat(divWapper.lastChild.style.top) - divWapper.imgHPadding) / divWapper.scaleFactor),
-        w: parseInt(divWapper.boxWidth / divWapper.scaleFactor), h: parseInt(divWapper.boxWidth * divWapper.targetBoxHWRatio / divWapper.scaleFactor)
+        fileName: imageContainer.fileName,
+        x: parseInt((parseFloat(imageContainer.lastChild.style.left) - imageContainer.imgWPadding) / imageContainer.scaleFactor), y: parseInt((parseFloat(imageContainer.lastChild.style.top) - imageContainer.imgHPadding) / imageContainer.scaleFactor),
+        w: parseInt(imageContainer.boxWidth / imageContainer.scaleFactor), h: parseInt(imageContainer.boxWidth * imageContainer.targetBoxHWRatio / imageContainer.scaleFactor)
       };
     }
 
-    function copyDivWapperStyle(fromDivWapper, toDivWapper) {
-      if (fromDivWapper == null) return;
-      toDivWapper.boxWidth = fromDivWapper.boxWidth;
-      toDivWapper.targetBoxHWRatio = fromDivWapper.targetBoxHWRatio
-      toDivWapper.boxLeft = fromDivWapper.boxLeft;
-      toDivWapper.boxTop = fromDivWapper.boxTop;
-      renderDivWapper(toDivWapper);
+    function copyimageContainerStyle(fromImageContainer, toImageContainer) {
+      if (fromImageContainer == null) return;
+      toImageContainer.boxWidth = fromImageContainer.boxWidth;
+      toImageContainer.targetBoxHWRatio = fromImageContainer.targetBoxHWRatio
+      toImageContainer.boxLeft = fromImageContainer.boxLeft;
+      toImageContainer.boxTop = fromImageContainer.boxTop;
+      renderimageContainer(toImageContainer);
     }
 
     function createImageCell(name, imgURL, id, maxImageW, maxImageH, targetW, targetBoxHWRatio) {
       const cell = document.createElement("div");
       cell.className = "cell";
-      const divWapper = document.createElement("div");
-      cell.appendChild(divWapper)
+      const imageContainer = document.createElement("div");
+      cell.appendChild(imageContainer)
 
-      divWapper.id = "div_" + id;
-      divWapper.className = "image-container";
-      divWapper.style.display = "inline-block";
-      divWapper.addEventListener('mousedown', (event) => { startDrag(event, divWapper) });
-      divWapper.addEventListener('mousemove', (event) => { drag(event, divWapper) });
-      divWapper.onwheel = (event) => { boxResize(event, divWapper) }
+      imageContainer.id = "div_" + id;
+      imageContainer.className = "image-container";
+      imageContainer.style.display = "inline-block";
+      imageContainer.addEventListener('mousedown', (event) => { startDrag(event, imageContainer) });
+      imageContainer.addEventListener('mousemove', (event) => { drag(event, imageContainer) });
+      imageContainer.onwheel = (event) => { boxResize(event, imageContainer) }
 
-      divWapper.imgWPadding = parseInt(paddingWInput.value);
-      divWapper.imgHPadding = parseInt(paddingHInput.value);
+      imageContainer.imgWPadding = parseInt(paddingWInput.value);
+      imageContainer.imgHPadding = parseInt(paddingHInput.value);
 
-      divWapper.boxWidth = Math.min(maxImageW - 2 * divWapper.imgWPadding, maxImageH/targetBoxHWRatio - 2 * divWapper.imgHPadding);
-      divWapper.targetBoxHWRatio = targetBoxHWRatio;
-      divWapper.boxLeft = divWapper.imgWPadding;
-      divWapper.boxTop = divWapper.imgHPadding;
-      divWapper.discard = false;
-      divWapper.targetW = targetW;
+      imageContainer.boxWidth = 1;
+      imageContainer.targetBoxHWRatio = targetBoxHWRatio;
+      imageContainer.boxLeft = imageContainer.imgWPadding;
+      imageContainer.boxTop = imageContainer.imgHPadding;
+      imageContainer.discard = false;
+      imageContainer.targetW = targetW;
 
       const image = new Image();
-      divWapper.appendChild(image);
+      imageContainer.appendChild(image);
 
       image.id = id;
       image.src = imgURL;
 
       const box = document.createElement("div");
-      divWapper.appendChild(box);
+      imageContainer.appendChild(box);
 
       box.className = "box";
       box.id = "box_" + id;
 
-      divWapper.fileName = name;
+      imageContainer.fileName = name;
 
       image.onload = () => {
-        var scaleFactor = Math.min((maxImageW - 2 * divWapper.imgWPadding) / image.naturalWidth, (maxImageH - 2 * divWapper.imgHPadding) / image.naturalHeight);
+        var scaleFactor = Math.min((maxImageW - 2 * imageContainer.imgWPadding) / image.naturalWidth, (maxImageH - 2 * imageContainer.imgHPadding) / image.naturalHeight);
 
         image.width = image.naturalWidth * scaleFactor;
         image.height = image.naturalHeight * scaleFactor;
-        divWapper.scaleFactor = scaleFactor;
+        imageContainer.scaleFactor = scaleFactor;
+
+        imageContainer.boxWidth = Math.min(image.width, image.height / targetBoxHWRatio);
+        imageContainer.boxLeft = (image.width - imageContainer.boxWidth) / 2;
+        imageContainer.boxTop = (image.height - imageContainer.boxWidth * targetBoxHWRatio) / 2;
+        renderimageContainer(imageContainer);
       }
-      
-      renderDivWapper(divWapper);
+
+      renderimageContainer(imageContainer);
       return cell;
     }
 
@@ -271,8 +276,8 @@
       const imgWPadding = parseInt(paddingWInput.value);
       const imgHPadding = parseInt(paddingHInput.value);
 
-      const maxImageW = document.documentElement.clientWidth / 4;
-      const maxImageH = document.documentElement.clientHeight / 2;
+      const maxImageW = document.documentElement.clientWidth / 2;
+      const maxImageH = document.documentElement.clientHeight / 3;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -283,26 +288,26 @@
     }
 
     // ----------------------------------------Image Crop---------------------------------------------------------//
-    function crop(divWapper) {
-      const img = divWapper.firstChild;
+    function crop(imageContainer) {
+      const img = imageContainer.firstChild;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      canvas.width = divWapper.targetW;
-      canvas.height = divWapper.targetW * divWapper.targetBoxHWRatio;
+      canvas.width = imageContainer.targetW;
+      canvas.height = imageContainer.targetW * imageContainer.targetBoxHWRatio;
 
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const dimension = getDimension(divWapper)
-      ctx.drawImage(img, dimension.x, dimension.y, dimension.w, dimension.h, 0, 0, divWapper.targetW, divWapper.targetW * divWapper.targetBoxHWRatio);
+      const dimension = getDimension(imageContainer)
+      ctx.drawImage(img, dimension.x, dimension.y, dimension.w, dimension.h, 0, 0, imageContainer.targetW, imageContainer.targetW * imageContainer.targetBoxHWRatio);
 
       return { img: canvas.toDataURL("image/png").split(';base64,')[1], fileName: dimension.fileName };
     }
 
     function cropAllAndDownload() {
-      const divWappers = getAlldivWapper(true);
-      const newImgs = divWappers.map(crop);
+      const imageContainers = getAllimageContainer(true);
+      const newImgs = imageContainers.map(crop);
       var zip = new JSZip();
       newImgs.forEach(function (imgs, index) {
         zip.file(imgs.fileName + ".png", imgs.img, { base64: true });
@@ -316,22 +321,22 @@
 
 
     // ----------------------------------------Box---------------------------------------------------------//
-    function startDrag(event, divWapper) {
+    function startDrag(event, imageContainer) {
       event.preventDefault();
       if (event.shiftKey) {
-        copyDivWapperStyle(divWapperBase, divWapper);
+        copyimageContainerStyle(imageContainerBase, imageContainer);
         return;
       } else if (event.ctrlKey) {
-        divWapperBase = event.target.parentElement;
+        imageContainerBase = event.target.parentElement;
         return;
       } else if (event.altKey) {
-        divWapper.discard = !divWapper.discard;
-        renderDivWapper(divWapper);
+        imageContainer.discard = !imageContainer.discard;
+        renderimageContainer(imageContainer);
         return;
       }
 
-      const box = divWapper.lastChild;
-      draggingElement = divWapper;
+      const box = imageContainer.lastChild;
+      draggingElement = imageContainer;
       boxStartX = box.offsetLeft;
       boxStartY = box.offsetTop;
       mouseStartX = event.clientX;
@@ -342,7 +347,7 @@
       draggingElement = null;
     }
 
-    function drag(event, divWapper) {
+    function drag(event, imageContainer) {
       const draggingElement_ = draggingElement;
       if (draggingElement_ == null) return;
       const img = draggingElement_.firstChild;
@@ -356,50 +361,51 @@
       if (top > img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding) top = img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding;
       draggingElement_.boxLeft = left;
       draggingElement_.boxTop = top;
-      renderDivWapper(draggingElement_);
+      renderimageContainer(draggingElement_);
     }
 
 
 
-    function renderDivWapper(divWapper) {
-      const box = divWapper.lastChild;
+    function renderimageContainer(imageContainer) {
+      const box = imageContainer.lastChild;
       box.style.display = 'block';
-      box.style.left = `${divWapper.boxLeft}px`;
-      box.style.top = `${divWapper.boxTop}px`;
-      box.style.width = `${divWapper.boxWidth}px`;
-      box.style.height = `${divWapper.boxWidth * divWapper.targetBoxHWRatio}px`;
+      box.style.left = `${imageContainer.boxLeft}px`;
+      box.style.top = `${imageContainer.boxTop}px`;
+      box.style.width = `${imageContainer.boxWidth}px`;
+      box.style.height = `${imageContainer.boxWidth * imageContainer.targetBoxHWRatio}px`;
       box.style.borderColor = boxColor;
-      if (divWapper.discard) { box.style.borderColor = "black"; }
-      divWapper.firstChild.style.padding = `${divWapper.imgHPadding}px ${divWapper.imgWPadding}px ${divWapper.imgHPadding}px ${divWapper.imgWPadding}px`
+      box.style.borderWidth = "3px";
+      if (imageContainer.discard) { box.style.borderColor = "black"; box.style.borderWidth = "50px"; }
+      imageContainer.firstChild.style.padding = `${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px ${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px`
     }
 
-    function boxResize(event, divWapper) {
+    function boxResize(event, imageContainer) {
       event.preventDefault();
       const deltaSize = event.deltaY * 0.1;
-      boxResize_(deltaSize, divWapper);;
+      boxResize_(deltaSize, imageContainer);;
     }
 
-    function boxResize_(deltaX, divWapper) {
-      const deltaY = deltaX * divWapper.targetBoxHWRatio;
-      const img = divWapper.firstChild;
-      const box = divWapper.lastChild
+    function boxResize_(deltaX, imageContainer) {
+      const deltaY = deltaX * imageContainer.targetBoxHWRatio;
+      const img = imageContainer.firstChild;
+      const box = imageContainer.lastChild
 
-      var boxLeft = divWapper.boxLeft;
-      var boxTop = divWapper.boxTop;
+      var boxLeft = imageContainer.boxLeft;
+      var boxTop = imageContainer.boxTop;
 
       const maxL = boxLeft;
-      const maxR = img.clientWidth - boxLeft - divWapper.boxWidth;
+      const maxR = img.clientWidth - boxLeft - imageContainer.boxWidth;
       const maxT = boxTop
-      const maxB = img.clientHeight - boxTop - divWapper.boxWidth * divWapper.targetBoxHWRatio;
+      const maxB = img.clientHeight - boxTop - imageContainer.boxWidth * imageContainer.targetBoxHWRatio;
 
       if (deltaX > 0 && deltaY > 0) {
         if ((maxL == 0 && maxR == 0) || (maxT == 0 && maxB == 0)) return;
 
-        else if (maxL != 0 && maxR != 0 && (maxL * 2 < deltaX || maxR * 2 < deltaX)) return boxResize_(Math.min(maxL, maxR) * 2, divWapper);
-        else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2, divWapper);
+        else if (maxL != 0 && maxR != 0 && (maxL * 2 < deltaX || maxR * 2 < deltaX)) return boxResize_(Math.min(maxL, maxR) * 2, imageContainer);
+        else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2, imageContainer);
 
-        else if (maxL + maxR < deltaX) return boxResize_(maxL + maxR, divWapper);
-        else if (maxT + maxB < deltaY) return boxResize_((maxT + maxB) / divWapper.targetBoxHWRatio, divWapper);
+        else if (maxL + maxR < deltaX) return boxResize_(maxL + maxR, imageContainer);
+        else if (maxT + maxB < deltaY) return boxResize_((maxT + maxB) / imageContainer.targetBoxHWRatio, imageContainer);
 
         if (maxL == 0) boxLeft += 0.5 * deltaX;
         else if (maxR == 0) boxLeft -= 0.5 * deltaX;
@@ -408,14 +414,14 @@
         else if (maxB == 0) boxTop -= 0.5 * deltaY
       }
 
-      if (divWapper.boxWidth + deltaX < 0) return boxResize_(-divWapper.boxWidth, divWapper);
-      if (divWapper.boxWidth * divWapper.targetBoxHWRatio + deltaY < 0) return boxResize_(-divWapper.boxWidth, divWapper);
+      if (imageContainer.boxWidth + deltaX < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
+      if (imageContainer.boxWidth * imageContainer.targetBoxHWRatio + deltaY < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
 
-      divWapper.boxWidth += deltaX;
+      imageContainer.boxWidth += deltaX;
 
-      divWapper.boxLeft = boxLeft - 0.5 * deltaX;
-      divWapper.boxTop = boxTop - 0.5 * deltaY;
-      renderDivWapper(divWapper);
+      imageContainer.boxLeft = boxLeft - 0.5 * deltaX;
+      imageContainer.boxTop = boxTop - 0.5 * deltaY;
+      renderimageContainer(imageContainer);
     }
 
     document.addEventListener('mouseup', endDrag);
