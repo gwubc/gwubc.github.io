@@ -2,433 +2,434 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>ImageCrop</title>
-  <style>
-    .image-container {
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <title>ImageCrop</title>
+    <style>
+        .image-container {
+            position: relative;
+        }
 
-    #image-container img,
-    .cell {
-      user-drag: none;
-      user-select: none;
-      -moz-user-select: none;
-      -webkit-user-drag: none;
-      -webkit-user-select: none;
-      -ms-user-select: none;
-    }
+        #image-container img,
+        .cell {
+            user-drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
 
-    img {
-      border: 1px solid rgb(150, 150, 150);
-    }
+        img {
+            border: 1px solid rgb(150, 150, 150);
+        }
 
-    .cell {
-      display: inline-block;
-      padding-top: 5px;
-      padding-right: 5px;
-      padding-bottom: 5px;
-      padding-left: 5px;
-    }
+        .cell {
+            display: inline-block;
+            padding-top: 5px;
+            padding-right: 5px;
+            padding-bottom: 5px;
+            padding-left: 5px;
+        }
 
-    .box {
-      box-sizing: border-box;
-      position: absolute;
-      border: 3px solid rgba(128, 0, 255, 0.61);
-      pointer-events: none;
-      border-style: dashed;
+        .box {
+            box-sizing: border-box;
+            position: absolute;
+            border: 3px solid rgba(128, 0, 255, 0.61);
+            pointer-events: none;
+            border-style: dashed;
 
-    }
+        }
 
-    .dropzone {
-      width: 30vw;
-      height: 10vh;
-      border: 2px dashed #aaa;
-      margin: 20px;
-      text-align: center;
-      padding-top: 100px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+        .dropzone {
+            width: 30vw;
+            height: 10vh;
+            border: 2px dashed #aaa;
+            margin: 20px;
+            text-align: center;
+            padding-top: 100px;
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-    #navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: #333;
-      color: #fff;
-      padding: 10px;
-      z-index: 1;
-    }
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            z-index: 1;
+        }
 
-    #navbar a {
-      color: #fff;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+        #navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
 
 </head>
 
 <body>
-  <nav id="navbar">
+    <nav id="navbar">
 
-    <label for="targetWInput">targetW:</label>
-    <input type="number" id="targetWInput" name="targetWInput" min="1" max="5000" value="512">
-    <label for="targetHInput">targetH:</label>
-    <input type="number" id="targetHInput" name="targetHInput" min="1" max="5000" value="512">
-    <br>
-    <label for="paddingWInput">paddingW:</label>
-    <input type="number" id="paddingWInput" name="paddingWInput" min="0" max="5000" value="0">
-    <label for="paddingHInput">paddingH:</label>
-    <input type="number" id="paddingHInput" name="paddingHInput" min="0" max="5000" value="0">
-    <br>
-    <button onclick="updateAll()">Apply</button>
+        <label for="targetWInput">targetW:</label>
+        <input type="number" id="targetWInput" name="targetWInput" min="1" max="5000" value="512">
+        <label for="targetHInput">targetH:</label>
+        <input type="number" id="targetHInput" name="targetHInput" min="1" max="5000" value="512">
+        <br>
+        <label for="paddingWInput">paddingW:</label>
+        <input type="number" id="paddingWInput" name="paddingWInput" min="0" max="5000" value="0">
+        <label for="paddingHInput">paddingH:</label>
+        <input type="number" id="paddingHInput" name="paddingHInput" min="0" max="5000" value="0">
+        <br>
+        <button onclick="updateAll()">Apply</button>
 
-    <br>
-    <button onclick="clearAllImages()">Clear All Images</button>
-    <button onclick="cropAllAndDownload()">Crop And Download</button>
-  </nav>
+        <br>
+        <button onclick="clearAllImages()">Clear All Images</button>
+        <button onclick="cropAllAndDownload()">Crop And Download</button>
+    </nav>
 
-  <div id="main">
-    <input type="file" id="folderInput" style="display: none;" multiple>
+    <div id="main">
+        <h1><a href="https://github.com/gwubc/gwubc.github.io/blob/main/doc/ImageCrop.md">Read me (How to)</a></h1>
+        <input type="file" id="folderInput" style="display: none;" multiple>
 
-    <div class="dropzone" onclick="document.getElementById('folderInput').click();">
-      Drop image here or click to choose
+        <div class="dropzone" onclick="document.getElementById('folderInput').click();">
+            Drop image(s) here or click to choose
+        </div>
+
+        <!-- <button onclick="saveAsJson()">SaveAsJson</button> -->
+
+        <div id="imageContainers"></div>
     </div>
+    <script>
+        var draggingElement = null;
+        var boxStartX, boxStartY, mouseStartX, mouseStartY;
+        var imageContainerBase = null;
 
-    <!-- <button onclick="saveAsJson()">SaveAsJson</button> -->
+        const boxColor = "red";
 
-    <div id="imageContainers"></div>
-  </div>
-  <script>
-    var draggingElement = null;
-    var boxStartX, boxStartY, mouseStartX, mouseStartY;
-    var imageContainerBase = null;
+        const targetWInput = document.querySelector('#targetWInput');
+        const targetHInput = document.querySelector('#targetHInput');
+        const paddingWInput = document.querySelector('#paddingWInput');
+        const paddingHInput = document.querySelector('#paddingHInput');
+        const dropzone = document.querySelector(".dropzone");
+        const folderInput = document.querySelector('#folderInput');
+        const imageContainers = document.querySelector('#imageContainers');
 
-    const boxColor = "red";
+        // ----------------------------------------Init---------------------------------------------------------//
 
-    const targetWInput = document.querySelector('#targetWInput');
-    const targetHInput = document.querySelector('#targetHInput');
-    const paddingWInput = document.querySelector('#paddingWInput');
-    const paddingHInput = document.querySelector('#paddingHInput');
-    const dropzone = document.querySelector(".dropzone");
-    const folderInput = document.querySelector('#folderInput');
-    const imageContainers = document.querySelector('#imageContainers');
-
-    // ----------------------------------------Init---------------------------------------------------------//
-
-    window.onload = () => {
-      document.querySelector('#main').style.paddingTop = document.querySelector('#navbar').offsetHeight + "px";
-    }
-    // ----------------------------------------Drop Box---------------------------------------------------------//
-    ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-      dropzone.addEventListener(eventName, preventDefaults, false)
-      document.body.addEventListener(eventName, preventDefaults, false)
-    });
-
-    dropzone.addEventListener("drop", handleDrop, false);
-
-    function handleDrop(e) {
-      preventDefaults(e);
-      handleFiles(e.dataTransfer.files);
-    }
-
-
-    // ----------------------------------------Buttons---------------------------------------------------------//
-    function updateAll() {
-      const targetW = parseInt(targetWInput.value);
-      const targetBoxHWRatio = parseInt(targetHInput.value) / targetW;
-      const imgWPadding = parseInt(paddingWInput.value);
-      const imgHPadding = parseInt(paddingHInput.value);
-      const imageContainers = getAllimageContainer();
-
-      for (var i = 0; i < imageContainers.length; i++) {
-        const imageContainer = imageContainers[i];
-        imageContainer.boxLeft += imgWPadding - imageContainer.imgWPadding;
-        if (imageContainer.boxLeft < 0) imageContainer.boxLeft = 0;
-        imageContainer.boxTop += imgHPadding - imageContainer.imgHPadding;
-        if (imageContainer.boxTop < 0) imageContainer.boxTop = 0;
-
-        imageContainer.targetW = targetW;
-        if (targetBoxHWRatio > imageContainer.targetBoxHWRatio) imageContainer.boxWidth = imageContainer.boxWidth * imageContainer.targetBoxHWRatio / targetBoxHWRatio;
-        imageContainer.targetBoxHWRatio = targetBoxHWRatio;
-        imageContainer.imgWPadding = imgWPadding;
-        imageContainer.imgHPadding = imgHPadding;
-        // imageContainer.firstChild.onload();
-        renderimageContainer(imageContainer);
-      }
-    }
-
-
-    function saveAsJson() {
-      const imageContainers = getAllimageContainer()
-      const boxsJson = imageContainers.map(getDimension);
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(boxsJson));
-      const dlAnchorElem = document.createElement("a");
-      dlAnchorElem.setAttribute("href", dataStr);
-      dlAnchorElem.setAttribute("download", "cropData.json");
-      dlAnchorElem.click();
-    }
-
-    function clearAllImages() {
-      while (imageContainers.firstChild) {
-        imageContainers.removeChild(imageContainers.firstChild);
-      }
-    }
-
-    folderInput.addEventListener('change', function () {
-      handleFiles(folderInput.files);
-    });
-    // ----------------------------------------Helpers---------------------------------------------------------//
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    function getAllimageContainer(ignoreDiscard = false) {
-      retVal = [];
-      var children = imageContainers.children;
-      for (var i = 0; i < children.length; i++) {
-        const imageContainer = children[i].firstChild;
-        if ((!ignoreDiscard) || (!imageContainer.discard)) retVal.push(imageContainer);
-      }
-      return retVal;
-    }
-
-    function getDimension(imageContainer) {
-      return {
-        fileName: imageContainer.fileName,
-        x: parseInt((parseFloat(imageContainer.lastChild.style.left) - imageContainer.imgWPadding) / imageContainer.scaleFactor), y: parseInt((parseFloat(imageContainer.lastChild.style.top) - imageContainer.imgHPadding) / imageContainer.scaleFactor),
-        w: parseInt(imageContainer.boxWidth / imageContainer.scaleFactor), h: parseInt(imageContainer.boxWidth * imageContainer.targetBoxHWRatio / imageContainer.scaleFactor)
-      };
-    }
-
-    function copyimageContainerStyle(fromImageContainer, toImageContainer) {
-      if (fromImageContainer == null) return;
-      toImageContainer.boxWidth = fromImageContainer.boxWidth;
-      toImageContainer.targetBoxHWRatio = fromImageContainer.targetBoxHWRatio
-      toImageContainer.boxLeft = fromImageContainer.boxLeft;
-      toImageContainer.boxTop = fromImageContainer.boxTop;
-      renderimageContainer(toImageContainer);
-    }
-
-    function createImageCell(name, imgURL, id, maxImageW, maxImageH, targetW, targetBoxHWRatio) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      const imageContainer = document.createElement("div");
-      cell.appendChild(imageContainer)
-
-      imageContainer.id = "div_" + id;
-      imageContainer.className = "image-container";
-      imageContainer.style.display = "inline-block";
-      imageContainer.addEventListener('mousedown', (event) => { startDrag(event, imageContainer) });
-      imageContainer.addEventListener('mousemove', (event) => { drag(event, imageContainer) });
-      imageContainer.onwheel = (event) => { boxResize(event, imageContainer) }
-
-      imageContainer.imgWPadding = parseInt(paddingWInput.value);
-      imageContainer.imgHPadding = parseInt(paddingHInput.value);
-
-      imageContainer.boxWidth = 1;
-      imageContainer.targetBoxHWRatio = targetBoxHWRatio;
-      imageContainer.boxLeft = imageContainer.imgWPadding;
-      imageContainer.boxTop = imageContainer.imgHPadding;
-      imageContainer.discard = false;
-      imageContainer.targetW = targetW;
-
-      const image = new Image();
-      imageContainer.appendChild(image);
-
-      image.id = id;
-      image.src = imgURL;
-
-      const box = document.createElement("div");
-      imageContainer.appendChild(box);
-
-      box.className = "box";
-      box.id = "box_" + id;
-
-      imageContainer.fileName = name;
-
-      image.onload = () => {
-        var scaleFactor = Math.min((maxImageW - 2 * imageContainer.imgWPadding) / image.naturalWidth, (maxImageH - 2 * imageContainer.imgHPadding) / image.naturalHeight);
-
-        image.width = image.naturalWidth * scaleFactor;
-        image.height = image.naturalHeight * scaleFactor;
-        imageContainer.scaleFactor = scaleFactor;
-
-        imageContainer.boxWidth = Math.min(image.width, image.height / targetBoxHWRatio);
-        imageContainer.boxLeft = (image.width - imageContainer.boxWidth) / 2;
-        imageContainer.boxTop = (image.height - imageContainer.boxWidth * targetBoxHWRatio) / 2;
-        renderimageContainer(imageContainer);
-      }
-
-      renderimageContainer(imageContainer);
-      return cell;
-    }
-
-    function handleFiles(files) {
-      const targetW = parseInt(targetWInput.value);
-      const targetBoxHWRatio = parseInt(targetHInput.value) / targetW;
-      const imgWPadding = parseInt(paddingWInput.value);
-      const imgHPadding = parseInt(paddingHInput.value);
-
-      const maxImageW = document.documentElement.clientWidth / 2;
-      const maxImageH = document.documentElement.clientHeight / 3;
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.type.match('image.*')) {
-          imageContainers.appendChild(createImageCell(file.name.replace(/\.[^/.]+$/, ""), URL.createObjectURL(file), i, maxImageW, maxImageH, targetW, targetBoxHWRatio));
+        window.onload = () => {
+            document.querySelector('#main').style.paddingTop = document.querySelector('#navbar').offsetHeight + "px";
         }
-      }
-    }
+        // ----------------------------------------Drop Box---------------------------------------------------------//
+        ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false)
+            document.body.addEventListener(eventName, preventDefaults, false)
+        });
 
-    // ----------------------------------------Image Crop---------------------------------------------------------//
-    function crop(imageContainer) {
-      const img = imageContainer.firstChild;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+        dropzone.addEventListener("drop", handleDrop, false);
 
-      canvas.width = imageContainer.targetW;
-      canvas.height = imageContainer.targetW * imageContainer.targetBoxHWRatio;
-
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const dimension = getDimension(imageContainer)
-      ctx.drawImage(img, dimension.x, dimension.y, dimension.w, dimension.h, 0, 0, imageContainer.targetW, imageContainer.targetW * imageContainer.targetBoxHWRatio);
-
-      return { img: canvas.toDataURL("image/png").split(';base64,')[1], fileName: dimension.fileName };
-    }
-
-    function cropAllAndDownload() {
-      const imageContainers = getAllimageContainer(true);
-      const newImgs = imageContainers.map(crop);
-      var zip = new JSZip();
-      newImgs.forEach(function (imgs, index) {
-        zip.file(imgs.fileName + ".png", imgs.img, { base64: true });
-      });
-      zip.generateAsync({ type: "blob" }).then(function (content) {
-        saveAs(content, 'images.zip');
-      });
-    }
+        function handleDrop(e) {
+            preventDefaults(e);
+            handleFiles(e.dataTransfer.files);
+        }
 
 
+        // ----------------------------------------Buttons---------------------------------------------------------//
+        function updateAll() {
+            const targetW = parseInt(targetWInput.value);
+            const targetBoxHWRatio = parseInt(targetHInput.value) / targetW;
+            const imgWPadding = parseInt(paddingWInput.value);
+            const imgHPadding = parseInt(paddingHInput.value);
+            const imageContainers = getAllimageContainer();
+
+            for (var i = 0; i < imageContainers.length; i++) {
+                const imageContainer = imageContainers[i];
+                imageContainer.boxLeft += imgWPadding - imageContainer.imgWPadding;
+                if (imageContainer.boxLeft < 0) imageContainer.boxLeft = 0;
+                imageContainer.boxTop += imgHPadding - imageContainer.imgHPadding;
+                if (imageContainer.boxTop < 0) imageContainer.boxTop = 0;
+
+                imageContainer.targetW = targetW;
+                if (targetBoxHWRatio > imageContainer.targetBoxHWRatio) imageContainer.boxWidth = imageContainer.boxWidth * imageContainer.targetBoxHWRatio / targetBoxHWRatio;
+                imageContainer.targetBoxHWRatio = targetBoxHWRatio;
+                imageContainer.imgWPadding = imgWPadding;
+                imageContainer.imgHPadding = imgHPadding;
+                // imageContainer.firstChild.onload();
+                renderimageContainer(imageContainer);
+            }
+        }
 
 
-    // ----------------------------------------Box---------------------------------------------------------//
-    function startDrag(event, imageContainer) {
-      event.preventDefault();
-      if (event.shiftKey) {
-        copyimageContainerStyle(imageContainerBase, imageContainer);
-        return;
-      } else if (event.ctrlKey) {
-        imageContainerBase = event.target.parentElement;
-        return;
-      } else if (event.altKey) {
-        imageContainer.discard = !imageContainer.discard;
-        renderimageContainer(imageContainer);
-        return;
-      }
+        function saveAsJson() {
+            const imageContainers = getAllimageContainer()
+            const boxsJson = imageContainers.map(getDimension);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(boxsJson));
+            const dlAnchorElem = document.createElement("a");
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "cropData.json");
+            dlAnchorElem.click();
+        }
 
-      const box = imageContainer.lastChild;
-      draggingElement = imageContainer;
-      boxStartX = box.offsetLeft;
-      boxStartY = box.offsetTop;
-      mouseStartX = event.clientX;
-      mouseStartY = event.clientY;
-    }
+        function clearAllImages() {
+            while (imageContainers.firstChild) {
+                imageContainers.removeChild(imageContainers.firstChild);
+            }
+        }
 
-    function endDrag() {
-      draggingElement = null;
-    }
+        folderInput.addEventListener('change', function () {
+            handleFiles(folderInput.files);
+        });
+        // ----------------------------------------Helpers---------------------------------------------------------//
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-    function drag(event, imageContainer) {
-      const draggingElement_ = draggingElement;
-      if (draggingElement_ == null) return;
-      const img = draggingElement_.firstChild;
-      const box = draggingElement_.lastChild;
-      var left = boxStartX + event.clientX - mouseStartX;
-      var top = boxStartY + event.clientY - mouseStartY;
-      const padding = 0;
-      if (left < -padding) left = -padding;
-      if (top < -padding) top = -padding;
-      if (left > img.clientWidth - draggingElement_.boxWidth + padding) left = img.clientWidth - draggingElement_.boxWidth + padding;
-      if (top > img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding) top = img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding;
-      draggingElement_.boxLeft = left;
-      draggingElement_.boxTop = top;
-      renderimageContainer(draggingElement_);
-    }
+        function getAllimageContainer(ignoreDiscard = false) {
+            retVal = [];
+            var children = imageContainers.children;
+            for (var i = 0; i < children.length; i++) {
+                const imageContainer = children[i].firstChild;
+                if ((!ignoreDiscard) || (!imageContainer.discard)) retVal.push(imageContainer);
+            }
+            return retVal;
+        }
+
+        function getDimension(imageContainer) {
+            return {
+                fileName: imageContainer.fileName,
+                x: parseInt((parseFloat(imageContainer.lastChild.style.left) - imageContainer.imgWPadding) / imageContainer.scaleFactor), y: parseInt((parseFloat(imageContainer.lastChild.style.top) - imageContainer.imgHPadding) / imageContainer.scaleFactor),
+                w: parseInt(imageContainer.boxWidth / imageContainer.scaleFactor), h: parseInt(imageContainer.boxWidth * imageContainer.targetBoxHWRatio / imageContainer.scaleFactor)
+            };
+        }
+
+        function copyimageContainerStyle(fromImageContainer, toImageContainer) {
+            if (fromImageContainer == null) return;
+            toImageContainer.boxWidth = fromImageContainer.boxWidth;
+            toImageContainer.targetBoxHWRatio = fromImageContainer.targetBoxHWRatio
+            toImageContainer.boxLeft = fromImageContainer.boxLeft;
+            toImageContainer.boxTop = fromImageContainer.boxTop;
+            renderimageContainer(toImageContainer);
+        }
+
+        function createImageCell(name, imgURL, id, maxImageW, maxImageH, targetW, targetBoxHWRatio) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            const imageContainer = document.createElement("div");
+            cell.appendChild(imageContainer)
+
+            imageContainer.id = "div_" + id;
+            imageContainer.className = "image-container";
+            imageContainer.style.display = "inline-block";
+            imageContainer.addEventListener('mousedown', (event) => { startDrag(event, imageContainer) });
+            imageContainer.addEventListener('mousemove', (event) => { drag(event, imageContainer) });
+            imageContainer.onwheel = (event) => { boxResize(event, imageContainer) }
+
+            imageContainer.imgWPadding = parseInt(paddingWInput.value);
+            imageContainer.imgHPadding = parseInt(paddingHInput.value);
+
+            imageContainer.boxWidth = 1;
+            imageContainer.targetBoxHWRatio = targetBoxHWRatio;
+            imageContainer.boxLeft = imageContainer.imgWPadding;
+            imageContainer.boxTop = imageContainer.imgHPadding;
+            imageContainer.discard = false;
+            imageContainer.targetW = targetW;
+
+            const image = new Image();
+            imageContainer.appendChild(image);
+
+            image.id = id;
+            image.src = imgURL;
+
+            const box = document.createElement("div");
+            imageContainer.appendChild(box);
+
+            box.className = "box";
+            box.id = "box_" + id;
+
+            imageContainer.fileName = name;
+
+            image.onload = () => {
+                var scaleFactor = Math.min((maxImageW - 2 * imageContainer.imgWPadding) / image.naturalWidth, (maxImageH - 2 * imageContainer.imgHPadding) / image.naturalHeight);
+
+                image.width = image.naturalWidth * scaleFactor;
+                image.height = image.naturalHeight * scaleFactor;
+                imageContainer.scaleFactor = scaleFactor;
+
+                imageContainer.boxWidth = Math.min(image.width, image.height / targetBoxHWRatio);
+                imageContainer.boxLeft = (image.width - imageContainer.boxWidth) / 2;
+                imageContainer.boxTop = (image.height - imageContainer.boxWidth * targetBoxHWRatio) / 2;
+                renderimageContainer(imageContainer);
+            }
+
+            renderimageContainer(imageContainer);
+            return cell;
+        }
+
+        function handleFiles(files) {
+            const targetW = parseInt(targetWInput.value);
+            const targetBoxHWRatio = parseInt(targetHInput.value) / targetW;
+            const imgWPadding = parseInt(paddingWInput.value);
+            const imgHPadding = parseInt(paddingHInput.value);
+
+            const maxImageW = document.documentElement.clientWidth / 2;
+            const maxImageH = document.documentElement.clientHeight / 3;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.match('image.*')) {
+                    imageContainers.appendChild(createImageCell(file.name.replace(/\.[^/.]+$/, ""), URL.createObjectURL(file), i, maxImageW, maxImageH, targetW, targetBoxHWRatio));
+                }
+            }
+        }
+
+        // ----------------------------------------Image Crop---------------------------------------------------------//
+        function crop(imageContainer) {
+            const img = imageContainer.firstChild;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = imageContainer.targetW;
+            canvas.height = imageContainer.targetW * imageContainer.targetBoxHWRatio;
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const dimension = getDimension(imageContainer)
+            ctx.drawImage(img, dimension.x, dimension.y, dimension.w, dimension.h, 0, 0, imageContainer.targetW, imageContainer.targetW * imageContainer.targetBoxHWRatio);
+
+            return { img: canvas.toDataURL("image/png").split(';base64,')[1], fileName: dimension.fileName };
+        }
+
+        function cropAllAndDownload() {
+            const imageContainers = getAllimageContainer(true);
+            const newImgs = imageContainers.map(crop);
+            var zip = new JSZip();
+            newImgs.forEach(function (imgs, index) {
+                zip.file(imgs.fileName + ".png", imgs.img, { base64: true });
+            });
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, 'images.zip');
+            });
+        }
 
 
 
-    function renderimageContainer(imageContainer) {
-      const box = imageContainer.lastChild;
-      box.style.display = 'block';
-      box.style.left = `${imageContainer.boxLeft}px`;
-      box.style.top = `${imageContainer.boxTop}px`;
-      box.style.width = `${imageContainer.boxWidth}px`;
-      box.style.height = `${imageContainer.boxWidth * imageContainer.targetBoxHWRatio}px`;
-      box.style.borderColor = boxColor;
-      box.style.borderWidth = "3px";
-      if (imageContainer.discard) { box.style.borderColor = "black"; box.style.borderWidth = "50px"; }
-      imageContainer.firstChild.style.padding = `${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px ${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px`
-    }
 
-    function boxResize(event, imageContainer) {
-      event.preventDefault();
-      const deltaSize = event.deltaY * 0.1;
-      var factor = 1;
-      if (imageContainer.targetBoxHWRatio > 1) factor = 1.0 / imageContainer.targetBoxHWRatio;
-      boxResize_(deltaSize * factor, imageContainer);;
-    }
+        // ----------------------------------------Box---------------------------------------------------------//
+        function startDrag(event, imageContainer) {
+            event.preventDefault();
+            if (event.shiftKey) {
+                copyimageContainerStyle(imageContainerBase, imageContainer);
+                return;
+            } else if (event.ctrlKey) {
+                imageContainerBase = event.target.parentElement;
+                return;
+            } else if (event.altKey) {
+                imageContainer.discard = !imageContainer.discard;
+                renderimageContainer(imageContainer);
+                return;
+            }
 
-    function boxResize_(deltaX, imageContainer) {
-      const deltaY = deltaX * imageContainer.targetBoxHWRatio;
-      const img = imageContainer.firstChild;
-      const box = imageContainer.lastChild
+            const box = imageContainer.lastChild;
+            draggingElement = imageContainer;
+            boxStartX = box.offsetLeft;
+            boxStartY = box.offsetTop;
+            mouseStartX = event.clientX;
+            mouseStartY = event.clientY;
+        }
 
-      var boxLeft = imageContainer.boxLeft;
-      var boxTop = imageContainer.boxTop;
+        function endDrag() {
+            draggingElement = null;
+        }
 
-      const maxL = parseInt(boxLeft);
-      const maxR = parseInt(img.clientWidth - boxLeft - imageContainer.boxWidth);
-      const maxT = parseInt(boxTop);
-      const maxB = parseInt(img.clientHeight - boxTop - imageContainer.boxWidth * imageContainer.targetBoxHWRatio);
+        function drag(event, imageContainer) {
+            const draggingElement_ = draggingElement;
+            if (draggingElement_ == null) return;
+            const img = draggingElement_.firstChild;
+            const box = draggingElement_.lastChild;
+            var left = boxStartX + event.clientX - mouseStartX;
+            var top = boxStartY + event.clientY - mouseStartY;
+            const padding = 0;
+            if (left < -padding) left = -padding;
+            if (top < -padding) top = -padding;
+            if (left > img.clientWidth - draggingElement_.boxWidth + padding) left = img.clientWidth - draggingElement_.boxWidth + padding;
+            if (top > img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding) top = img.clientHeight - draggingElement_.boxWidth * draggingElement_.targetBoxHWRatio + padding;
+            draggingElement_.boxLeft = left;
+            draggingElement_.boxTop = top;
+            renderimageContainer(draggingElement_);
+        }
 
-      if (deltaX > 0 && deltaY > 0) {
-        if ((maxL == 0 && maxR == 0) || (maxT == 0 && maxB == 0)) return;
 
-        else if (maxL != 0 && maxR != 0 && (maxL * 2 < deltaX || maxR * 2 < deltaX)) return boxResize_(Math.min(maxL, maxR) * 2, imageContainer);
-        else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2 / imageContainer.targetBoxHWRatio, imageContainer);
 
-        else if (maxL + maxR < deltaX) return boxResize_(maxL + maxR, imageContainer);
-        else if (maxT + maxB < deltaY) return boxResize_((maxT + maxB) / imageContainer.targetBoxHWRatio, imageContainer);
+        function renderimageContainer(imageContainer) {
+            const box = imageContainer.lastChild;
+            box.style.display = 'block';
+            box.style.left = `${imageContainer.boxLeft}px`;
+            box.style.top = `${imageContainer.boxTop}px`;
+            box.style.width = `${imageContainer.boxWidth}px`;
+            box.style.height = `${imageContainer.boxWidth * imageContainer.targetBoxHWRatio}px`;
+            box.style.borderColor = boxColor;
+            box.style.borderWidth = "3px";
+            if (imageContainer.discard) { box.style.borderColor = "black"; box.style.borderWidth = "50px"; }
+            imageContainer.firstChild.style.padding = `${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px ${imageContainer.imgHPadding}px ${imageContainer.imgWPadding}px`
+        }
 
-        if (maxL == 0) boxLeft += 0.5 * deltaX;
-        else if (maxR == 0) boxLeft -= 0.5 * deltaX;
+        function boxResize(event, imageContainer) {
+            event.preventDefault();
+            const deltaSize = event.deltaY * 0.1;
+            var factor = 1;
+            if (imageContainer.targetBoxHWRatio > 1) factor = 1.0 / imageContainer.targetBoxHWRatio;
+            boxResize_(deltaSize * factor, imageContainer);;
+        }
 
-        if (maxT == 0) boxTop += 0.5 * deltaY;
-        else if (maxB == 0) boxTop -= 0.5 * deltaY
-      }
+        function boxResize_(deltaX, imageContainer) {
+            const deltaY = deltaX * imageContainer.targetBoxHWRatio;
+            const img = imageContainer.firstChild;
+            const box = imageContainer.lastChild
 
-      if (imageContainer.boxWidth + deltaX < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
-      if (imageContainer.boxWidth * imageContainer.targetBoxHWRatio + deltaY < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
+            var boxLeft = imageContainer.boxLeft;
+            var boxTop = imageContainer.boxTop;
 
-      imageContainer.boxWidth += deltaX;
+            const maxL = parseInt(boxLeft);
+            const maxR = parseInt(img.clientWidth - boxLeft - imageContainer.boxWidth);
+            const maxT = parseInt(boxTop);
+            const maxB = parseInt(img.clientHeight - boxTop - imageContainer.boxWidth * imageContainer.targetBoxHWRatio);
 
-      imageContainer.boxLeft = boxLeft - 0.5 * deltaX;
-      imageContainer.boxTop = boxTop - 0.5 * deltaY;
-      renderimageContainer(imageContainer);
-    }
+            if (deltaX > 0 && deltaY > 0) {
+                if ((maxL == 0 && maxR == 0) || (maxT == 0 && maxB == 0)) return;
 
-    document.addEventListener('mouseup', endDrag);
+                else if (maxL != 0 && maxR != 0 && (maxL * 2 < deltaX || maxR * 2 < deltaX)) return boxResize_(Math.min(maxL, maxR) * 2, imageContainer);
+                else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2 / imageContainer.targetBoxHWRatio, imageContainer);
 
-  </script>
+                else if (maxL + maxR < deltaX) return boxResize_(maxL + maxR, imageContainer);
+                else if (maxT + maxB < deltaY) return boxResize_((maxT + maxB) / imageContainer.targetBoxHWRatio, imageContainer);
+
+                if (maxL == 0) boxLeft += 0.5 * deltaX;
+                else if (maxR == 0) boxLeft -= 0.5 * deltaX;
+
+                if (maxT == 0) boxTop += 0.5 * deltaY;
+                else if (maxB == 0) boxTop -= 0.5 * deltaY
+            }
+
+            if (imageContainer.boxWidth + deltaX < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
+            if (imageContainer.boxWidth * imageContainer.targetBoxHWRatio + deltaY < 0) return boxResize_(-imageContainer.boxWidth, imageContainer);
+
+            imageContainer.boxWidth += deltaX;
+
+            imageContainer.boxLeft = boxLeft - 0.5 * deltaX;
+            imageContainer.boxTop = boxTop - 0.5 * deltaY;
+            renderimageContainer(imageContainer);
+        }
+
+        document.addEventListener('mouseup', endDrag);
+
+    </script>
 </body>
 
 </html>
