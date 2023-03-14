@@ -382,7 +382,9 @@
     function boxResize(event, imageContainer) {
       event.preventDefault();
       const deltaSize = event.deltaY * 0.1;
-      boxResize_(deltaSize, imageContainer);;
+      var factor = 1;
+      if (imageContainer.targetBoxHWRatio > 1) factor = 1.0 / imageContainer.targetBoxHWRatio;
+      boxResize_(deltaSize * factor, imageContainer);;
     }
 
     function boxResize_(deltaX, imageContainer) {
@@ -393,16 +395,16 @@
       var boxLeft = imageContainer.boxLeft;
       var boxTop = imageContainer.boxTop;
 
-      const maxL = boxLeft;
-      const maxR = img.clientWidth - boxLeft - imageContainer.boxWidth;
-      const maxT = boxTop
-      const maxB = img.clientHeight - boxTop - imageContainer.boxWidth * imageContainer.targetBoxHWRatio;
+      const maxL = parseInt(boxLeft);
+      const maxR = parseInt(img.clientWidth - boxLeft - imageContainer.boxWidth);
+      const maxT = parseInt(boxTop);
+      const maxB = parseInt(img.clientHeight - boxTop - imageContainer.boxWidth * imageContainer.targetBoxHWRatio);
 
       if (deltaX > 0 && deltaY > 0) {
         if ((maxL == 0 && maxR == 0) || (maxT == 0 && maxB == 0)) return;
 
         else if (maxL != 0 && maxR != 0 && (maxL * 2 < deltaX || maxR * 2 < deltaX)) return boxResize_(Math.min(maxL, maxR) * 2, imageContainer);
-        else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2, imageContainer);
+        else if (maxT != 0 && maxB != 0 && (maxT * 2 < deltaY || maxB * 2 < deltaY)) return boxResize_(Math.min(maxT, maxB) * 2 / imageContainer.targetBoxHWRatio, imageContainer);
 
         else if (maxL + maxR < deltaX) return boxResize_(maxL + maxR, imageContainer);
         else if (maxT + maxB < deltaY) return boxResize_((maxT + maxB) / imageContainer.targetBoxHWRatio, imageContainer);
